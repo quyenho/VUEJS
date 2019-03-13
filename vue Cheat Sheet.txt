@@ -1,0 +1,58 @@
+Pass Param to route
+router.js
+ {
+      path: '/PetList/Detail/:id',
+      name: 'Detail',
+      component: Detail
+    }
+
+//List
+ <li v-for="(pet,index) in petList" :key="index">
+    <router-link :to="{'name':'Detail', params:{'id':pet.id}}">{{pet.id}}</router-link>
+    {{pet.name}}
+    </li>
+  </ul>
+
+
+app.Service
+import axios from 'axios'
+
+axios.defaults.baseURL ='http://localhost:64008/api/'
+const appService ={
+  getList() {
+         return new Promise(
+                (resolve) =>{
+                    axios.get(`Pets`).then(response => {resolve(response.data)})
+
+                }
+
+         )
+  },
+
+  getToken(){
+      return new Promise(
+          (resolve)=>{
+              axios.post(`Token`,{"Email":"Tofi","Password":"Tofi"}).then(
+                  response => {resolve(response.data.token)}
+              )
+          }
+      )
+  },
+    getPosts(token){
+       return new Promise(
+            (resolve) => {
+               
+                axios.get(`Pets`, {headers:{ 'Authorization': `Bearer ${token}` }}).then(
+                    response => 
+                    {
+                        resolve( response.data)
+                    }
+                )
+            }
+
+       )
+    }
+     
+}
+
+export default appService
