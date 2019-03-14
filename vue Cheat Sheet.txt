@@ -15,44 +15,98 @@ router.js
 
 
 app.Service
-import axios from 'axios'
+ axios.defaults.baseURL = 'http://localhost:58379/api';
 
-axios.defaults.baseURL ='http://localhost:64008/api/'
 const appService ={
-  getList() {
-         return new Promise(
-                (resolve) =>{
-                    axios.get(`Pets`).then(response => {resolve(response.data)})
 
-                }
+    getPets(token) {
+           return new Promise(
+              (resolve,reject)=>{
+                  axios.get(`Pets`, {headers:{"Authorization":`Bearer ${token}`}}).then(
+                      response =>{(resolve(response.data))}
+                  ).catch(response => {reject(response.response)})
+              }
+           ) 
 
-         )
-  },
+    },
+    getDetail(id, token){
+        return new Promise(
+           resolve => {
+               axios.get('PetDetail/' +id, {headers: {'Authorization' :`Bearer ${token}`}}).then(response =>{
+                   resolve(response.data)
 
-  getToken(){
-      return new Promise(
-          (resolve)=>{
-              axios.post(`Token`,{"Email":"Tofi","Password":"Tofi"}).then(
-                  response => {resolve(response.data.token)}
-              )
-          }
-      )
-  },
-    getPosts(token){
-       return new Promise(
-            (resolve) => {
-               
-                axios.get(`Pets`, {headers:{ 'Authorization': `Bearer ${token}` }}).then(
-                    response => 
-                    {
-                        resolve( response.data)
-                    }
-                )
-            }
+               })
+           }
+          
 
-       )
-    }
-     
+        )
+    },
+    getToken(){
+        return new Promise(
+           resolve => {
+               axios.post('Token', {"Email":"Tofi","Password":"Tofi"}).then(response =>{
+                   resolve(response.data)
+
+               })
+           }
+          
+
+        )
+    } 
+
+  
 }
 
 export default appService
+
+
+
+
+
+
+
+
+
+
+
+
+
+import appService from '../services/app.Service.js'
+   const myPets =[];
+   const error ={};
+  export default  {
+    name: 'pets',
+    props: [],
+    mounted() {
+       this.getPets () ;
+    },
+    data() {
+      return {
+          myPets
+      }
+    },
+    methods: {
+        getPets () {
+          if (  localStorage.token && localStorage.token !=null ){
+                appService.getPets(localStorage.token).then(data =>
+                {
+                this.myPets = data
+                }).catch((data) => window.alert(data.status))
+              
+          }else{
+
+             appService.getToken().then(data =>{
+                 localStorage.token= data.token
+                  appService.getPets(localStorage.token).then(data =>{
+                this.myPets = data})
+             })
+              
+
+          }
+             
+              
+        }
+    },
+    computed: {
+         
+    },
