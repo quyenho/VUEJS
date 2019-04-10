@@ -1,3 +1,17 @@
+npm install -g @vue/cli
+
+npm install -g vue-generate-component ( For vue component )
+
+vue create my-project
+
+npm install axios --save
+
+
+vgc -s <componentName> --folder
+
+
+
+
 Pass Param to route
 router.js
  {
